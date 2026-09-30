@@ -42,4 +42,16 @@ Avoid medieval fantasy props, clean spaceship corridors, excessive neon, rainbow
 
 ## Production asset refinement
 
-The first production hero asset is the Echo. Its authored form refines the direction with a faceted dark mineral core, one offset oxidized-metal resonance ring, and three unevenly spaced warm resonance shards. The bright material is concentrated in the core and shards; the ring stays dark and legible. This preserves the established gold/purple artifact role while making the Echo readable as a singular designed object rather than a primitive plus loose decoration.
+The first production hero asset is the Echo. It should read as an ancient object that has been corrupted and reactivated by music: a splintered dark mineral mass bound by a broken oxidized-metal frame, leaking restrained violet resonance through its fractures.
+
+### Echo construction language
+
+- **Core**: a convex-hull mineral mass built from a handful of widely spaced points, so the form carries a few large planar facets instead of a rounded shell. It is deliberately asymmetric, with cut fracture pockets that expose resonance from inside and shallow dark seams across the broadest facets.
+- **Frame**: hand-authored claw straps swept along curved paths, a slipped diagonal strap, a back spine, and a detached remnant of a former hoop with jagged snapped ends. Thickness varies along every strap, arcs are interrupted rather than closed, and several straps intersect and cradle the core. Nothing encircles the core as a clean ring.
+- **Shards**: tapered resonance blades that grow out of the frame junctions at varied sizes and orientations. The blade body stays dark mineral; only the outer section carries resonance, so emission reads as flow out of the artifact.
+
+The bright material stays small and earned. The frame remains dark and legible, the mineral carries the mass, and tarnished gold appears only as junction hardware. This preserves the established gold/purple artifact role while making the Echo readable as a singular designed object rather than a primitive plus loose decoration.
+
+### Silhouette rule
+
+The Echo must read as a unique object before materials and emission are visible. If its outline can be described as "crystal plus ring", the construction is wrong regardless of surface treatment. Shape, silhouette, construction, material relationship, and asymmetry are the primary tools; emission is used only after those are working.

@@ -57,3 +57,57 @@ The existing nine-state slice was reviewed for silhouette readability, lighting,
 ### Remaining visual gaps
 
 The Echo is a first production proof, not final art completion. It has no animation, texture maps, authored collision, or hand-painted surface variation. The Warden, player, environment, and VFX remain procedural/prototype representations. Formal performance profiling and physical-audio review remain outside this sandbox pass.
+
+## Echo hero-asset revision (shape pass)
+
+### Review finding that triggered the revision
+
+The first production Echo was functionally integrated, but its rendered result still read as a collection of primitive shapes: a stretched faceted core, one clean torus ring around it, and three cone shards. `06-echo-procedural-baseline.png` and `10-echo-production.png` show the same underlying read — "crystal plus ring". The object was legible but not yet an authored Voidcaller artifact.
+
+### What changed
+
+Only the visual asset changed. The Blender authoring script was rewritten to build the Echo from constructed geometry rather than primitives:
+
+- **Core**: a convex hull of a handful of widely spaced points, producing a small number of large planar facets and a tall splintered profile, plus two embedded fracture chips that break the outline. Six facets are cut into fracture pockets whose floors carry the resonance material, and three broad facets receive shallow dark seams.
+- **Frame**: no torus remains. The frame is a set of swept claw straps, a slipped diagonal strap, a back spine, an interrupted lower and upper collar, and a detached remnant of a former hoop. Every arc is interrupted, every strap tapers, ends are snapped rather than capped, and the straps visibly intersect and cradle the core.
+- **Shards**: tapered resonance blades rooted at the frame junctions, at three different sizes and deliberate orientations. The blade body is dark mineral and only the outer section is emissive.
+- **Materials**: still four, still inside the established palette — dark violet-tinted mineral, oxidized green-grey metal, tarnished gold junction hardware, and restrained violet-pink resonance. No rainbow, no cyan wash, no chrome, no saturated gem colours, no large white emission surfaces. Emission colour and strength were tuned so the resonance stays a saturated violet-pink instead of clipping to white.
+
+The gameplay scale is baked into the geometry, so `descent.gd` keeps its existing instance transform, visibility contract, interaction range, and music-event hook unchanged.
+
+### Silhouette test
+
+The revision was tested against a dark background (`12-echo-revision-silhouette.png`), against the actual chamber (`17-echo-revision-chamber-silhouette.png`), at normal gameplay distance (`13-echo-revision-gameplay-distance.png`), and from an oblique angle. Unshaded, the outline is an irregular splintered mass with three asymmetric blades and one detached broken arc. It is no longer describable as an orb or crystal inside a ring.
+
+### Captures
+
+| State | Capture | Review |
+|---|---|---|
+| Isolated asset | `11-echo-revision-isolated.png` | Faceted mineral mass, broken oxidized straps crossing the body, violet blade tips, gold junction hardware. |
+| Silhouette (dark background) | `12-echo-revision-silhouette.png` | Flat unshaded outline; unique asymmetric construction, no ring read. |
+| Gameplay distance | `13-echo-revision-gameplay-distance.png` | Reads at normal third-person distance in the descent corridor. |
+| Music chamber before | `14-echo-revision-chamber-before.png` | Echo sits in the dormant chamber without overpowering the lighting. |
+| Music chamber after | `15-echo-revision-chamber-after.png` | Echo holds its identity inside the violet wake of the music event. |
+| Interaction state | `16-echo-revision-interaction.png` | Interaction prompt is focused on the Echo and the artifact stays readable. |
+| Chamber silhouette | `17-echo-revision-chamber-silhouette.png` | Unshaded outline against the real chamber; still a unique object. |
+
+### Asset sanity facts (revision)
+
+- Runtime asset: 64 KB GLB.
+- Triangles: 866 (previous pass: 502; budget: under ~1,500).
+- Vertices: 1,848.
+- Blender mesh objects: 15.
+- Materials: 4 authored node materials.
+- Textures: none; no external texture dependency.
+- Scene complexity: one root assembly, no animation, no collision changes.
+
+### Verification
+
+- Godot import validation and headless startup: clean, no script errors.
+- Full first-playable path driven with synthesized input events: main menu → grotto → descent gate → Hollow Echo defeated → music event → Echo collected → Resonant Warden defeated → return gate → grotto. 18 of 18 checks passed.
+- Echo collection hides the mesh, writes `first_echo` to the save state, and the hub reports `ARCHIVE ECHOES: 1`.
+- Fresh-process persistence confirmed (`PLAYTEST ECHO_PERSISTED true`).
+
+### Remaining visual gaps (revision)
+
+The Echo still has no animation, texture maps, authored collision, or hand-painted surface variation, and the frame does not yet move or settle during the music event. The Warden, player, environment, and VFX remain procedural/prototype representations.
