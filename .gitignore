@@ -1,0 +1,13 @@
+.godot/
+*.tmp
+*.import
+export.cfg
+export_presets.cfg
+.DS_Store
+
+# Local runtime data
+user://
+*.save
+
+# Blender/Scenario working files are not source assets until intentionally imported
+*.blend1

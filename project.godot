@@ -1,0 +1,27 @@
+; The Grotto - Godot 4.7.2 foundation
+; Placeholder-only technical baseline.
+config_version=5
+
+[application]
+config/name="The Grotto"
+run/main_scene="res://scenes/main/main_menu.tscn"
+config/features=PackedStringArray("4.7")
+
+[display]
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/size/window_width_override=1280
+window/size/window_height_override=720
+window/stretch/mode="canvas_items"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/default_filters/use_nearest_mipmap_filter=false
+environment/defaults/default_clear_color=Color(0.015, 0.02, 0.035, 1)
+
+[autoload]
+InputSetup="*res://scripts/input/input_setup.gd"
+EventBus="*res://systems/events/event_bus.gd"
+SaveSystem="*res://systems/save/save_system.gd"
+AudioManager="*res://systems/music/audio_manager.gd"
