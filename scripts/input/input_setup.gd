@@ -10,6 +10,7 @@ func _ready() -> void:
 	_add_key_action("dodge", [KEY_C, KEY_SHIFT])
 	_add_key_action("interact", [KEY_E])
 	_add_key_action("pause", [KEY_ESCAPE])
+	_add_key_action("restart", [KEY_R])
 	if not InputMap.has_action("attack_mouse"):
 		InputMap.add_action("attack_mouse")
 		var mouse := InputEventMouseButton.new()

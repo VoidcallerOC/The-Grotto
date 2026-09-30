@@ -1,6 +1,6 @@
 # Resonant Warden — Authored Production Hero Asset
 
-**Status:** Authored production hero asset, integrated into the existing prototype encounter. It is not final game art.
+**Status:** Authored production hero asset, integrated into the existing prototype encounter. **ART STATUS: PLACEHOLDER / FROZEN / NOT APPROVED.** It is not final game art and must not be polished or replaced until a separate art-direction reset.
 
 ## Design intent
 

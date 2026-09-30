@@ -21,6 +21,8 @@ var enemy_defeated := false
 var climax_started := false
 var climax_defeated := false
 var event_meshes: Array[Node3D] = []
+var death_pending := false
+var death_layer: CanvasLayer
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -30,6 +32,7 @@ func _ready() -> void:
 	player = PLAYER_SCENE.instantiate()
 	player.position = Vector3(0, 0, 6)
 	add_child(player)
+	player.player_died.connect(_on_player_died)
 	enemy = _spawn_enemy(Vector3(0, 0, -6), 75, 1.8, 12)
 	_build_echo()
 	_build_ui()
@@ -37,6 +40,12 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if not is_instance_valid(player):
+		return
+	if death_pending:
+		if Input.is_action_just_pressed("restart"):
+			_restart_descent()
+		elif Input.is_action_just_pressed("pause"):
+			_return_to_grotto_after_death()
 		return
 	if not event_triggered and player.global_position.distance_to(Vector3(0, 0, -10)) < 3.0:
 		_trigger_music_event()
@@ -64,7 +73,7 @@ func _trigger_music_event() -> void:
 	print("PLAYTEST MUSIC_CHAMBER_REACHED")
 	SaveSystem.state["world_event_seen"] = true
 	SaveSystem.save_game()
-	AudioManager.trigger_music_event("BREAKDOWN", 1.0, {"lighting": "violet", "world_state": "awakened"})
+	AudioManager.trigger_music_event("BREAKDOWN", 1.0, {"section": "breakdown", "lighting": "violet", "world_state": "awakened"})
 	event_light.light_color = Color("#b652c4")
 	event_light.light_energy = 9.0
 	for node in event_meshes:
@@ -78,7 +87,7 @@ func _collect_echo() -> void:
 		echo_mesh.visible = false
 	SaveSystem.discover_echo("first_echo")
 	status.text = "ECHO DISCOVERED: The First Resonance"
-	AudioManager.trigger_music_event("ECHO_COLLECTED", 0.4)
+	AudioManager.trigger_music_event("ECHO_COLLECTED", 0.4, {"section": "resonance", "world_state": "echo_found"})
 
 func _start_climax() -> void:
 	climax_started = true
@@ -92,6 +101,7 @@ func _start_climax() -> void:
 	_update_enemy_health(climax_enemy.health, climax_enemy.max_health)
 	event_light.light_color = Color("#dd5b71")
 	event_light.light_energy = 13.0
+	AudioManager.trigger_music_event("WARDEN_CLIMAX", 1.0, {"section": "climax", "world_state": "warden_active"})
 
 func _on_enemy_defeated() -> void:
 	enemy_defeated = true
@@ -108,6 +118,51 @@ func _on_climax_defeated() -> void:
 	if is_instance_valid(enemy_health_label):
 		enemy_health_label.text = "RESONANT WARDEN DEFEATED"
 	player.target_enemy = null
+	AudioManager.trigger_music_event("WARDEN_DEFEATED", 0.2, {"section": "return", "world_state": "climax_cleared"})
+
+func _on_player_died() -> void:
+	if death_pending:
+		return
+	death_pending = true
+	print("PLAYTEST PLAYER_DEATH_STATE")
+	status.text = "YOU DIED — THE DESCENT REJECTS YOU"
+	prompt.text = "R  Retry the Descent    •    Esc  Return to the Grotto"
+	if is_instance_valid(enemy_health_label):
+		enemy_health_label.text = "RUN ENDED"
+	_show_death_overlay()
+	get_tree().paused = true
+
+func _restart_descent() -> void:
+	print("PLAYTEST RETRY_DESCENT")
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://scenes/descent/descent.tscn")
+
+func _return_to_grotto_after_death() -> void:
+	print("PLAYTEST DEATH_RETURN_TO_GROTTO")
+	get_tree().paused = false
+	SaveSystem.set_location("grotto")
+	get_tree().change_scene_to_file("res://scenes/grotto/grotto.tscn")
+
+func _show_death_overlay() -> void:
+	death_layer = CanvasLayer.new()
+	death_layer.layer = 10
+	add_child(death_layer)
+	var shade := ColorRect.new()
+	shade.color = Color(0.02, 0.01, 0.04, 0.72)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	death_layer.add_child(shade)
+	var title := Label.new()
+	title.text = "YOU DIED"
+	title.position = Vector2(520, 250)
+	title.add_theme_font_size_override("font_size", 42)
+	title.add_theme_color_override("font_color", Color("#e5a1b5"))
+	death_layer.add_child(title)
+	var help := Label.new()
+	help.text = "R  RETRY DESCENT\nESC  RETURN TO GROTTO"
+	help.position = Vector2(500, 325)
+	help.add_theme_font_size_override("font_size", 20)
+	help.add_theme_color_override("font_color", Color("#d4c48c"))
+	death_layer.add_child(help)
 
 func _spawn_enemy(pos: Vector3, health: int, speed: float, damage: int, style: String = "hollow") -> GrottoEnemy:
 	var spawned: GrottoEnemy = ENEMY_SCRIPT.new()
