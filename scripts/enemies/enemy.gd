@@ -9,6 +9,7 @@ signal hit_feedback
 @export var move_speed := 1.8
 @export var contact_damage := 12
 @export var visual_style := "hollow"
+const WARDEN_SCENE := preload("res://assets/models/warden_production.glb")
 var health := 75
 var player: GrottoPlayer
 var attack_timer := 0.0
@@ -60,34 +61,40 @@ func take_damage(amount: int) -> void:
 		queue_free()
 
 func _create_placeholder_body() -> void:
+	if visual_style == "warden":
+		# The authored GLB is visual-only. The CharacterBody3D and the existing
+		# sphere collider below remain the gameplay authority.
+		var warden_visual := WARDEN_SCENE.instantiate()
+		warden_visual.name = "Warden_Production"
+		warden_visual.position = Vector3(0.0, -0.08, 0.0)
+		add_child(warden_visual)
+		body_material = GrottoVisualKit.material(Color("#541e4d"), 0.25, 0.72, Color("#b83f8b"), 1.8)
+		GrottoVisualKit.add_light(self, "WardenCoreLight", Vector3(0, 1.25, 0), Color("#d74b91"), 0.7, 4.5)
+	else:
+		_create_hollow_body()
+		return
+
+	var collider := CollisionShape3D.new()
+	var shape := SphereShape3D.new()
+	shape.radius = 0.75
+	collider.shape = shape
+	collider.position.y = 0.75
+	add_child(collider)
+
+func _create_hollow_body() -> void:
 	var mesh := MeshInstance3D.new()
 	var sphere := SphereMesh.new()
-	sphere.height = 1.5 if visual_style == "hollow" else 1.15
-	sphere.radius = 0.75 if visual_style == "hollow" else 0.52
+	sphere.height = 1.5
+	sphere.radius = 0.75
 	mesh.mesh = sphere
 	body_material = StandardMaterial3D.new()
-	body_material.albedo_color = Color("#9a4765") if visual_style == "hollow" else Color("#541e4d")
+	body_material.albedo_color = Color("#9a4765")
 	body_material.emission_enabled = true
-	body_material.emission = Color("#321326") if visual_style == "hollow" else Color("#b83f8b")
-	body_material.emission_energy_multiplier = 1.8 if visual_style == "hollow" else 1.8
+	body_material.emission = Color("#321326")
+	body_material.emission_energy_multiplier = 1.8
 	mesh.material_override = body_material
 	mesh.position.y = 0.75
 	add_child(mesh)
-	if visual_style == "warden":
-		for ring_y in [0.35, 0.85, 1.35]:
-			var ring := CylinderMesh.new()
-			ring.top_radius = 0.95
-			ring.bottom_radius = 0.95
-			ring.height = 0.08
-			var ring_mesh := MeshInstance3D.new()
-			ring_mesh.mesh = ring
-			ring_mesh.position.y = ring_y
-			ring_mesh.rotation.z = 0.18 * (ring_y - 0.85)
-			ring_mesh.material_override = GrottoVisualKit.material(Color("#64235f"), 0.35, 0.65, Color("#e04da3"), 1.8)
-			add_child(ring_mesh)
-		for shard_x in [-0.75, 0.75]:
-			GrottoVisualKit.add_resonance_shard(self, "WardenShard", Vector3(shard_x, 0.9, 0), Color("#ea6b9a"), Vector3(0.55, 1.2, 0.55))
-		GrottoVisualKit.add_light(self, "WardenCoreLight", Vector3(0, 1.0, 0), Color("#d74b91"), 1.2, 5.0)
 	var collider := CollisionShape3D.new()
 	var shape := SphereShape3D.new()
 	shape.radius = 0.75

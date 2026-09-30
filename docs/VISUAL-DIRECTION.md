@@ -22,7 +22,7 @@ Arches, ribs, buried columns, broken slabs, embedded machinery, and asymmetrical
 
 ## Creature language
 
-The Hollow Echo is a compact, low silhouette with a dark rose core. The Resonant Warden is not a larger demon or robot: it is a floating resonance core held inside broken metallic rings and pointed shards, with a distinct red-violet silhouette.
+The Hollow Echo is a compact, low silhouette with a dark rose core. The Resonant Warden is not a larger demon or robot: it is an architectural guardian with a tall offset mineral mass, unequal shoulders, broken buttresses, a crown-like structural break, and a recessed resonance mechanism protected by interrupted ribs. Its red-violet activity comes from the integrated mechanism and damaged seams, not from a glowing humanoid body.
 
 ## VFX language
 

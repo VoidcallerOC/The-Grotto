@@ -111,3 +111,39 @@ The revision was tested against a dark background (`12-echo-revision-silhouette.
 ### Remaining visual gaps (revision)
 
 The Echo still has no animation, texture maps, authored collision, or hand-painted surface variation, and the frame does not yet move or settle during the music event. The Warden, player, environment, and VFX remain procedural/prototype representations.
+
+## Resonant Warden authored production hero asset
+
+### Integration boundary
+
+The previous Warden was a runtime placeholder: a sphere visual, three flat ring bands, two shard cones, and a point light. Its `CharacterBody3D`, separate sphere collider, health, attack, damage, defeat signal, climax trigger, gate visibility, and return-to-Grotto behavior were already valid and were preserved. The replacement changes only the `visual_style == "warden"` visual branch in `scripts/enemies/enemy.gd`; the authored GLB is visual-only and the existing collider remains authoritative.
+
+### Visual review findings
+
+The authored Warden reads as a guardian rather than an enlarged Echo. It has a tall asymmetric mineral mass, unequal shoulder plates, a long hooked left buttress, a shorter snapped right buttress, a rear spine, a broken crown, and three interrupted protective ribs around a recessed vertical resonance vein. The central mechanism is integrated into the body and partially obscured by structure; it is not a large glowing chest gem. In dark silhouette, the shoulder imbalance, broken appendages, crown, and negative-space channel remain identifiable before emission is considered.
+
+The material palette stays restrained: dark mineral, oxidized green-grey metal, tarnished junctions, near-black seams, and violet-pink resonance limited to the vein and blade tips. The active arena's red-violet light affects the context, but the Warden remains a materially separated object rather than a uniformly glowing boss.
+
+### Captures
+
+| State | Capture | Review |
+|---|---|---|
+| Isolated asset | `warden-01-isolated.png` | Front view shows the tall mineral body, unequal shoulders, broken crown, hooked supports, and protected central mechanism. |
+| Near-black silhouette | `warden-02-silhouette.png` | Silhouette remains structurally readable with only a minimal rim light. |
+| Gameplay distance | `warden-03-gameplay-distance.png` | Warden reads inside the actual red-violet arena at the existing third-person distance. |
+| Combat distance | `warden-04-combat-distance.png` | Warden remains readable with player and separate collision proxy in the encounter. |
+| Climax state | `warden-05-climax.png` | Real `CLIMAX_STARTED` state, 125 health, active arena lighting, and authored Warden visible together. |
+| Three-quarter | `warden-06-three-quarter.png` | Asymmetry, broken appendages, and depth of the ribs are visible from an oblique angle. |
+| Arena-wide | `warden-07-arena-wide.png` | Guardian remains a distinct landmark within the existing arena composition. |
+
+### Asset facts
+
+The reproducible Blender 4.3.2 script exports a 68 KB GLB with 20 mesh objects, 1,912 vertices, 910 triangles, five materials, zero textures, and zero animations. No real-hardware performance profile was performed; that remains unverified.
+
+### Runtime regression
+
+Godot import and startup validation passed without Warden script errors. The full first-playable path was executed with synthesized input through the real scenes: main menu → Grotto → Descent → Hollow Echo defeat → music event → Echo collection → Warden climax → Warden damage → Warden defeat → return gate → Grotto. The dedicated regression produced **13/13 checks passed**. Evidence includes `ENEMY_HIT` health transitions from 125 to 0, `ENEMY_DEFEATED`, `CLIMAX_DEFEATED`, `RETURN_TO_GROTTO`, and `ECHO_PERSISTED true`.
+
+### Honest limitations
+
+This is an **AUTHORED PRODUCTION HERO ASSET** for the current vertical slice, not final game art. It is static, unrigged, unanimated, textureless, and uses the existing gameplay sphere collider. Idle resonance motion, attack animation, defeat animation, authored collision, physical-audio review, and real-hardware performance profiling remain deferred or unverified. The capture driver emitted a benign ALSA dummy-audio warning in the sandbox; it did not affect visual or gameplay checks.
