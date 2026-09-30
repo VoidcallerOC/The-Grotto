@@ -1,6 +1,7 @@
 extends Node3D
 
 const PLAYER_SCENE := preload("res://scenes/player/player.tscn")
+const VISUAL_KIT := preload("res://scripts/world/visual_kit.gd")
 var player: GrottoPlayer
 var prompt: Label
 var status: Label
@@ -52,6 +53,9 @@ func _build_environment() -> void:
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color("#23364a")
 	environment.ambient_light_energy = 0.8
+	environment.fog_enabled = true
+	environment.fog_light_color = Color("#111b2a")
+	environment.fog_density = 0.018
 	world_env.environment = environment
 	add_child(world_env)
 	var light := OmniLight3D.new()
@@ -64,6 +68,28 @@ func _build_environment() -> void:
 	_add_box("FocalStone", Vector3(3.2, 1.2, 0), Vector3(2.4, 2.4, 2.4), Color("#36515a"))
 	_add_box("DescentFrame", gate_position + Vector3(0, 2, 0), Vector3(4, 4, 0.8), Color("#512f4c"))
 	_add_box("Archive", archive_position + Vector3(0, 1, 0), Vector3(2, 2, 2), Color("#9b7b45"))
+	var stone := VISUAL_KIT.material(Color("#182530"), 0.94)
+	var metal := VISUAL_KIT.material(Color("#26333a"), 0.7, 0.7)
+	var oxidized := VISUAL_KIT.material(Color("#31534f"), 0.86, 0.25)
+	var teal := VISUAL_KIT.material(Color("#2b7775"), 0.45, 0.1, Color("#54c8bd"), 2.4)
+	var gold := VISUAL_KIT.material(Color("#6b5230"), 0.45, 0.25, Color("#d2a85b"), 2.0)
+	for z in [-6.0, -1.5, 3.0]:
+		VISUAL_KIT.add_arch(self, "GrottoRib", Vector3(-5.2, 0, z), 3.0, 4.0, 0.8, stone)
+		VISUAL_KIT.add_arch(self, "GrottoRib", Vector3(5.2, 0, z), 3.0, 4.0, 0.8, stone)
+	for z in [-5.5, -1.0, 3.5]:
+		VISUAL_KIT.add_cylinder(self, "BuriedColumn", Vector3(-3.3, 1.5, z), 0.42, 3.0, metal)
+		VISUAL_KIT.add_cylinder(self, "BuriedColumn", Vector3(3.3, 1.5, z), 0.42, 3.0, oxidized)
+	VISUAL_KIT.add_arch(self, "DescentArch", gate_position + Vector3(0, 0, 0), 5.0, 4.8, 1.2, metal)
+	for x in [-1.6, -0.8, 0.8, 1.6]:
+		VISUAL_KIT.add_resonance_shard(self, "EntranceShard", gate_position + Vector3(x, 2.0, 0.5), Color("#54c8bd"), Vector3(0.7, 1.0, 0.7))
+	VISUAL_KIT.add_light(self, "EntranceLight", gate_position + Vector3(0, 2.0, 1.1), Color("#4db8b0"), 2.8, 7.0)
+	VISUAL_KIT.add_light(self, "ArchiveLight", archive_position + Vector3(0, 2.5, 0), Color("#c8924b"), 2.2, 5.0)
+	for x in [-1.4, 0.0, 1.4]:
+		VISUAL_KIT.add_resonance_shard(self, "ArchiveShard", archive_position + Vector3(x, 2.2, -0.8), Color("#d2a85b"), Vector3(0.65, 0.8, 0.65))
+	VISUAL_KIT.add_dust(self, "GrottoDust", Vector3(0, 2.0, 0), Color(0.45, 0.62, 0.65, 0.3), 55)
+	for pos in [Vector3(-4.4, 0.35, 1.5), Vector3(-2.0, 0.2, -3.0), Vector3(4.5, 0.25, -4.0), Vector3(2.2, 0.18, 4.0)]:
+		var growth := VISUAL_KIT.add_resonance_shard(self, "VoidGrowth", pos, Color("#4f9b85"), Vector3(0.9, 0.7, 0.9))
+		growth.rotation = Vector3(0.25, 0.4, -0.5)
 
 func _add_box(node_name: String, pos: Vector3, size: Vector3, color: Color) -> void:
 	var body := StaticBody3D.new()

@@ -2,6 +2,7 @@ extends Node3D
 
 const PLAYER_SCENE := preload("res://scenes/player/player.tscn")
 const ENEMY_SCRIPT := preload("res://scripts/enemies/enemy.gd")
+const VISUAL_KIT := preload("res://scripts/world/visual_kit.gd")
 var player: GrottoPlayer
 var enemy: GrottoEnemy
 var climax_enemy: GrottoEnemy
@@ -18,6 +19,7 @@ var event_triggered := false
 var enemy_defeated := false
 var climax_started := false
 var climax_defeated := false
+var event_meshes: Array[Node3D] = []
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -37,7 +39,7 @@ func _process(_delta: float) -> void:
 		return
 	if not event_triggered and player.global_position.distance_to(Vector3(0, 0, -10)) < 3.0:
 		_trigger_music_event()
-	if enemy_defeated and not echo_collected and player.global_position.distance_to(echo_position) < 2.2:
+	if event_triggered and not echo_collected and player.global_position.distance_to(echo_position) < 2.2:
 		prompt.text = "E  Collect the Echo"
 		if Input.is_action_just_pressed("interact"):
 			_collect_echo()
@@ -64,6 +66,8 @@ func _trigger_music_event() -> void:
 	AudioManager.trigger_music_event("BREAKDOWN", 1.0, {"lighting": "violet", "world_state": "awakened"})
 	event_light.light_color = Color("#b652c4")
 	event_light.light_energy = 9.0
+	for node in event_meshes:
+		node.visible = true
 	status.text = "MUSIC EVENT: BREAKDOWN — the Grotto wakes."
 
 func _collect_echo() -> void:
@@ -79,7 +83,9 @@ func _start_climax() -> void:
 	climax_started = true
 	print("PLAYTEST CLIMAX_STARTED")
 	status.text = "CLIMAX: THE RESONANT WARDEN AWAKENS"
-	climax_enemy = _spawn_enemy(Vector3(0, 0, -17), 125, 2.4, 18)
+	for node in event_meshes:
+		node.visible = false
+	climax_enemy = _spawn_enemy(Vector3(0, 0, -17), 125, 2.4, 18, "warden")
 	player.target_enemy = climax_enemy
 	climax_enemy.defeated.connect(_on_climax_defeated)
 	_update_enemy_health(climax_enemy.health, climax_enemy.max_health)
@@ -96,16 +102,19 @@ func _on_climax_defeated() -> void:
 	climax_defeated = true
 	print("PLAYTEST CLIMAX_DEFEATED player=", player.global_position)
 	status.text = "CLIMAX SURVIVED — the return gate is open."
+	prompt.text = "E  Return to the Grotto"
+	get_node("ClimaxGate/ClimaxGate_Visual").visible = true
 	if is_instance_valid(enemy_health_label):
 		enemy_health_label.text = "RESONANT WARDEN DEFEATED"
 	player.target_enemy = null
 
-func _spawn_enemy(pos: Vector3, health: int, speed: float, damage: int) -> GrottoEnemy:
+func _spawn_enemy(pos: Vector3, health: int, speed: float, damage: int, style: String = "hollow") -> GrottoEnemy:
 	var spawned: GrottoEnemy = ENEMY_SCRIPT.new()
 	spawned.position = pos
 	spawned.max_health = health
 	spawned.move_speed = speed
 	spawned.contact_damage = damage
+	spawned.visual_style = style
 	spawned.setup(player)
 	spawned.defeated.connect(_on_enemy_defeated)
 	spawned.health_changed.connect(_update_enemy_health)
@@ -148,28 +157,60 @@ func _build_environment() -> void:
 	_add_box("MusicChamber", Vector3(0, -0.15, -10), Vector3(10, 0.1, 4), Color("#3d2947"))
 	_add_box("EchoChamber", echo_position + Vector3(0, -0.15, 0), Vector3(3, 0.1, 3), Color("#40533e"))
 	_add_box("ClimaxGate", climax_position + Vector3(0, 2, 0), Vector3(5, 4, 0.7), Color("#522c61"))
+	get_node("ClimaxGate/ClimaxGate_Visual").visible = false
+	var stone := VISUAL_KIT.material(Color("#1c202d"), 0.94)
+	var metal := VISUAL_KIT.material(Color("#29343b"), 0.68, 0.72)
+	var oxidized := VISUAL_KIT.material(Color("#37514d"), 0.82, 0.22)
+	var dormant := VISUAL_KIT.material(Color("#3b2948"), 0.5, 0.2, Color("#593a72"), 0.6)
+	var resonance := VISUAL_KIT.material(Color("#492a5b"), 0.38, 0.22, Color("#ba50c7"), 2.6)
+	var warden_mat := VISUAL_KIT.material(Color("#321f37"), 0.34, 0.6, Color("#d34f8e"), 2.4)
+	for z in [1.5, -3.0, -7.0, -15.0]:
+		VISUAL_KIT.add_arch(self, "DescentRib", Vector3(-4.8, 0, z), 2.8, 4.6, 0.65, stone)
+		VISUAL_KIT.add_arch(self, "DescentRib", Vector3(4.8, 0, z), 2.8, 4.6, 0.65, stone)
+	for z in [-1.0, -5.0, -14.0]:
+		VISUAL_KIT.add_cylinder(self, "DescentColumn", Vector3(-3.7, 1.4, z), 0.38, 2.8, oxidized)
+		VISUAL_KIT.add_cylinder(self, "DescentColumn", Vector3(3.7, 1.4, z), 0.38, 2.8, metal)
+	for x in [-3.2, -1.6, 0.0, 1.6, 3.2]:
+		var rib := VISUAL_KIT.add_resonance_shard(self, "DormantResonance", Vector3(x, 2.0, -10.0), Color("#79528e"), Vector3(0.6, 0.8, 0.6))
+		rib.visible = false
+		event_meshes.append(rib)
+	var chamber_arch := VISUAL_KIT.add_box(self, "MusicChamberHeader", Vector3(0, 3.8, -10.0), Vector3(10, 0.6, 0.7), dormant)
+	chamber_arch.visible = false
+	event_meshes.append(chamber_arch)
+	for x in [-4.0, 4.0]:
+		var event_pillar := VISUAL_KIT.add_cylinder(self, "EventPillar", Vector3(x, 2.0, -10.0), 0.4, 4.0, resonance)
+		event_pillar.visible = false
+		event_meshes.append(event_pillar)
+	for x in [-2.2, 0.0, 2.2]:
+		VISUAL_KIT.add_resonance_shard(self, "WardenArenaShard", climax_position + Vector3(x, 0.0, 1.6), Color("#d34f8e"), Vector3(0.7, 1.2, 0.7))
+	VISUAL_KIT.add_cylinder(self, "WardenArenaPillar", climax_position + Vector3(-3.0, 2.2, 0), 0.45, 4.4, metal)
+	VISUAL_KIT.add_cylinder(self, "WardenArenaPillar", climax_position + Vector3(3.0, 2.2, 0), 0.45, 4.4, metal)
+	VISUAL_KIT.add_light(self, "EchoLight", echo_position + Vector3(0, 1.0, 0), Color("#d6a454"), 2.5, 5.0)
+	VISUAL_KIT.add_light(self, "WardenArenaLight", climax_position + Vector3(0, 3.0, 0), Color("#a83e73"), 3.0, 8.0)
+	VISUAL_KIT.add_dust(self, "DescentDust", Vector3(0, 2.0, -8.0), Color(0.37, 0.29, 0.48, 0.26), 70)
 
 func _build_echo() -> void:
 	echo_mesh = MeshInstance3D.new()
 	echo_mesh.name = "Echo"
-	var sphere := SphereMesh.new()
-	sphere.radius = 0.55
-	sphere.height = 1.1
-	echo_mesh.mesh = sphere
+	var crystal := CylinderMesh.new()
+	crystal.top_radius = 0.0
+	crystal.bottom_radius = 0.42
+	crystal.height = 1.5
+	echo_mesh.mesh = crystal
 	echo_mesh.position = echo_position + Vector3(0, 1.0, 0)
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color("#e1c77b")
-	mat.emission_enabled = true
-	mat.emission = Color("#9d6f20")
-	mat.emission_energy_multiplier = 3.0
-	echo_mesh.material_override = mat
+	echo_mesh.rotation = Vector3(0.12, 0.35, -0.18)
+	echo_mesh.material_override = VISUAL_KIT.material(Color("#a4773c"), 0.28, 0.25, Color("#f0c86c"), 4.0)
 	add_child(echo_mesh)
+	for angle in [0.0, 2.1, 4.2]:
+		var shard := VISUAL_KIT.add_resonance_shard(self, "EchoShard", echo_position + Vector3(cos(angle) * 0.9, 0.65, sin(angle) * 0.9), Color("#e9bd62"), Vector3(0.42, 0.7, 0.42))
+		shard.rotation = Vector3(0.3, angle, -0.25)
 
 func _add_box(node_name: String, pos: Vector3, size: Vector3, color: Color) -> void:
 	var body := StaticBody3D.new()
 	body.name = node_name
 	body.position = pos
 	var mesh := MeshInstance3D.new()
+	mesh.name = node_name + "_Visual"
 	var box := BoxMesh.new()
 	box.size = size
 	mesh.mesh = box
