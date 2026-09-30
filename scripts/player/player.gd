@@ -57,6 +57,9 @@ func attack() -> void:
 	if is_instance_valid(target_enemy) and global_position.distance_to(target_enemy.global_position) < 2.6:
 		target_enemy.take_damage(25)
 
+func is_dodging() -> bool:
+	return dodge_timer > 0.0
+
 func receive_damage(amount: int) -> void:
 	if dodge_timer > 0.0:
 		return

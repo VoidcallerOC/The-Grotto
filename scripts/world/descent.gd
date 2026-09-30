@@ -11,6 +11,8 @@ var prompt: Label
 var status: Label
 var health_label: Label
 var enemy_health_label: Label
+var combat_hint: Label
+var echo_effect_label: Label
 var event_light: OmniLight3D
 var echo_mesh: Node3D
 var echo_position := Vector3(0, 0, -12)
@@ -98,6 +100,10 @@ func _start_climax() -> void:
 	climax_enemy = _spawn_enemy(Vector3(0, 0, -17), 125, 2.4, 18, "warden")
 	player.target_enemy = climax_enemy
 	climax_enemy.defeated.connect(_on_climax_defeated)
+	climax_enemy.warden_state_changed.connect(_on_warden_state_changed)
+	climax_enemy.resonance_guard_used.connect(_on_resonance_guard_used)
+	_on_warden_state_changed(climax_enemy.warden_phase, climax_enemy.warden_state)
+	_update_echo_effect_label()
 	_update_enemy_health(climax_enemy.health, climax_enemy.max_health)
 	event_light.light_color = Color("#dd5b71")
 	event_light.light_energy = 13.0
@@ -117,8 +123,46 @@ func _on_climax_defeated() -> void:
 	get_node("ClimaxGate/ClimaxGate_Visual").visible = true
 	if is_instance_valid(enemy_health_label):
 		enemy_health_label.text = "RESONANT WARDEN DEFEATED"
+	if is_instance_valid(combat_hint):
+		combat_hint.text = "THE RETURN GATE IS OPEN"
 	player.target_enemy = null
 	AudioManager.trigger_music_event("WARDEN_DEFEATED", 0.2, {"section": "return", "world_state": "climax_cleared"})
+
+func _on_warden_state_changed(phase: int, state_id: String) -> void:
+	if not is_instance_valid(combat_hint):
+		return
+	var hint := ""
+	match state_id:
+		"idle":
+			hint = "PHASE %d — WATCH THE WARDEN" % phase
+		"lunge_telegraph":
+			hint = "LUNGE WINDUP — DODGE OR MOVE ASIDE"
+		"lunge_attack":
+			hint = "LUNGE — DODGE OR MOVE ASIDE"
+		"pulse_telegraph":
+			hint = "RESONANCE PULSE CHARGING — MOVE OUTSIDE 4.2M OR DODGE"
+		"pulse_attack":
+			hint = "RESONANCE PULSE — GET OUTSIDE THE RADIUS OR DODGE"
+		"core_guarded":
+			hint = "PHASE 2 — CORE GUARDED; WAIT FOR THE OPENING"
+		"core_exposed":
+			hint = "PHASE 2 — CORE EXPOSED; ATTACK NOW"
+		"recovery":
+			hint = "PHASE %d — RESET AND REPOSITION" % phase
+		_:
+			hint = "PHASE %d — %s" % [phase, state_id.to_upper()]
+	combat_hint.text = hint
+
+func _update_echo_effect_label() -> void:
+	if not is_instance_valid(echo_effect_label):
+		return
+	if is_instance_valid(climax_enemy) and climax_enemy.resonance_guard_charges > 0:
+		echo_effect_label.text = "ECHO GUARD: READY — BLOCKS ONE WARDEN HIT"
+	else:
+		echo_effect_label.text = "ECHO GUARD: SPENT"
+
+func _on_resonance_guard_used() -> void:
+	_update_echo_effect_label()
 
 func _on_player_died() -> void:
 	if death_pending:
@@ -290,6 +334,14 @@ func _build_ui() -> void:
 	enemy_health_label.position = Vector2(34, 98)
 	enemy_health_label.add_theme_color_override("font_color", Color("#efb37c"))
 	layer.add_child(enemy_health_label)
+	combat_hint = Label.new()
+	combat_hint.position = Vector2(34, 126)
+	combat_hint.add_theme_color_override("font_color", Color("#e5a1b5"))
+	layer.add_child(combat_hint)
+	echo_effect_label = Label.new()
+	echo_effect_label.position = Vector2(34, 152)
+	echo_effect_label.add_theme_color_override("font_color", Color("#d4c48c"))
+	layer.add_child(echo_effect_label)
 	prompt = Label.new()
 	prompt.position = Vector2(34, 650)
 	prompt.add_theme_font_size_override("font_size", 18)

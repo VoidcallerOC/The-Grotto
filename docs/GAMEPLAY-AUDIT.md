@@ -23,8 +23,8 @@ No remaining P0 blocker was found. The main menu launches, the player moves, sce
 
 ### P2 — materially hurts gameplay or UX
 
-- The Warden currently has one contact-damage behavior and one health bar; it has no authored attack patterns, telegraphs, phases, arena hazards, or meaningful counterplay beyond attack and dodge.
-- The Echo is persisted only as an ID in an array. It has no metadata, lore/context, effect, upgrade path, or run modifier.
+- **Fixed in the gameplay-core pass:** the Warden now has telegraphed lunge and pulse attacks, movement/dodge counters, and a phase-two guarded-core attack window. The placeholder HUD explains the response.
+- **Fixed in the gameplay-core pass:** the First Echo is a structured persistent record with one Resonance Guard charge that blocks one Warden hit per encounter.
 - The Grotto displays an archive count but has no archive interaction, run selection, upgrade choice, or meaningful hub decision.
 - The descent is a fixed corridor with no optional route or recoverable exploration choice.
 - Pause is functional as a global tree pause, but there is no dedicated pause menu with resume/restart/return affordances.
@@ -47,10 +47,10 @@ All current Echo, Warden, player, environment, and UI visuals are **PLACEHOLDER 
 | Player | Direct movement, one attack, dodge, health | Functional prototype; no combo, stamina, hitbox feedback, or death recovery before this pass |
 | Camera | Fixed third-person camera attached to player | Readable enough for the slice; final feel remains undecided |
 | Combat | Distance check against current target; 25 damage per attack | Functional but shallow; Warden counterplay is the main gameplay gap |
-| Enemy | Chase plus timed contact damage | Works for Hollow Echo and Warden; no phases or telegraphs |
-| Warden | Existing 125-health climax enemy | Can be damaged and defeated; currently one-phase |
+| Enemy | Hollow Echo chase/contact; Warden telegraphed attacks | Hollow Echo behavior remains unchanged; Warden attacks use explicit counter windows |
+| Warden | 125-health, two-phase encounter | Lunge, resonance pulse, guarded/exposed core cycle, and phase music state |
 | Music | Placeholder track plus explicit stateful event abstraction | Ready for authored sections and markers; no final music yet |
-| Echo | Collection, hidden mesh, persistent `first_echo` ID | Reliable persistence; no gameplay effect or lore data yet |
+| Echo | Collection, hidden mesh, structured `first_echo` record | Persistent Resonance Guard effect; legacy ID-only saves migrate on load |
 | Grotto | Hub, archive count, descent gate | Persistent home foundation; no archive interaction yet |
 | Save | Local JSON, missing-save defaults, malformed-save fallback | Reliable for current fields; no versioned migration layer needed yet |
 | UI | Health, enemy health, objective, interaction, event, victory, return | Death/retry feedback added; dedicated pause menu remains |
