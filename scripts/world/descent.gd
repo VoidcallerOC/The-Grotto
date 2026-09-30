@@ -3,6 +3,7 @@ extends Node3D
 const PLAYER_SCENE := preload("res://scenes/player/player.tscn")
 const ENEMY_SCRIPT := preload("res://scripts/enemies/enemy.gd")
 const VISUAL_KIT := preload("res://scripts/world/visual_kit.gd")
+const ECHO_SCENE := preload("res://assets/models/echo_production.glb")
 var player: GrottoPlayer
 var enemy: GrottoEnemy
 var climax_enemy: GrottoEnemy
@@ -11,7 +12,7 @@ var status: Label
 var health_label: Label
 var enemy_health_label: Label
 var event_light: OmniLight3D
-var echo_mesh: MeshInstance3D
+var echo_mesh: Node3D
 var echo_position := Vector3(0, 0, -12)
 var climax_position := Vector3(0, 0, -20)
 var echo_collected := false
@@ -190,20 +191,12 @@ func _build_environment() -> void:
 	VISUAL_KIT.add_dust(self, "DescentDust", Vector3(0, 2.0, -8.0), Color(0.37, 0.29, 0.48, 0.26), 70)
 
 func _build_echo() -> void:
-	echo_mesh = MeshInstance3D.new()
-	echo_mesh.name = "Echo"
-	var crystal := CylinderMesh.new()
-	crystal.top_radius = 0.0
-	crystal.bottom_radius = 0.42
-	crystal.height = 1.5
-	echo_mesh.mesh = crystal
+	echo_mesh = ECHO_SCENE.instantiate()
+	echo_mesh.name = "Echo_Production"
 	echo_mesh.position = echo_position + Vector3(0, 1.0, 0)
 	echo_mesh.rotation = Vector3(0.12, 0.35, -0.18)
-	echo_mesh.material_override = VISUAL_KIT.material(Color("#a4773c"), 0.28, 0.25, Color("#f0c86c"), 4.0)
+	echo_mesh.scale = Vector3(1.15, 1.15, 1.15)
 	add_child(echo_mesh)
-	for angle in [0.0, 2.1, 4.2]:
-		var shard := VISUAL_KIT.add_resonance_shard(self, "EchoShard", echo_position + Vector3(cos(angle) * 0.9, 0.65, sin(angle) * 0.9), Color("#e9bd62"), Vector3(0.42, 0.7, 0.42))
-		shard.rotation = Vector3(0.3, angle, -0.25)
 
 func _add_box(node_name: String, pos: Vector3, size: Vector3, color: Color) -> void:
 	var body := StaticBody3D.new()

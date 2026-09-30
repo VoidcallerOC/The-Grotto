@@ -39,3 +39,7 @@ Reference qualities include subterranean industrial ruins, eroded monolithic arc
 ## Things to avoid
 
 Avoid medieval fantasy props, clean spaceship corridors, excessive neon, rainbow grading, asset-pack soup, noisy decals, photorealistic clutter, unmotivated fog, and visual effects that obscure the player or enemy silhouette.
+
+## Production asset refinement
+
+The first production hero asset is the Echo. Its authored form refines the direction with a faceted dark mineral core, one offset oxidized-metal resonance ring, and three unevenly spaced warm resonance shards. The bright material is concentrated in the core and shards; the ring stays dark and legible. This preserves the established gold/purple artifact role while making the Echo readable as a singular designed object rather than a primitive plus loose decoration.
