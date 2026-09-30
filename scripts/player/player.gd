@@ -13,6 +13,7 @@ var dodge_timer := 0.0
 var attack_cooldown := 0.0
 var facing := Vector3.FORWARD
 var target_enemy: Node3D
+var movement_input_logged := false
 
 func _ready() -> void:
 	health = max_health
@@ -28,6 +29,9 @@ func _physics_process(delta: float) -> void:
 	var input_vec := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var direction := Vector3(input_vec.x, 0.0, input_vec.y)
 	if direction.length() > 0.1:
+		if not movement_input_logged:
+			movement_input_logged = true
+			print("PLAYTEST MOVEMENT_INPUT vector=", input_vec)
 		direction = direction.normalized()
 		facing = direction
 		rotation.y = lerp_angle(rotation.y, atan2(-facing.x, -facing.z), delta * 10.0)
@@ -48,6 +52,7 @@ func attack() -> void:
 	if attack_cooldown > 0.0:
 		return
 	attack_cooldown = 0.55
+	print("PLAYTEST PLAYER_ATTACK")
 	attack_landed.emit()
 	if is_instance_valid(target_enemy) and global_position.distance_to(target_enemy.global_position) < 2.6:
 		target_enemy.take_damage(25)
@@ -56,6 +61,7 @@ func receive_damage(amount: int) -> void:
 	if dodge_timer > 0.0:
 		return
 	health = maxi(health - amount, 0)
+	print("PLAYTEST PLAYER_DAMAGED health=", health, "/", max_health)
 	health_changed.emit(health, max_health)
 	if health == 0:
 		player_died.emit()

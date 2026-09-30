@@ -1,6 +1,10 @@
 # Asset licenses and provenance
 
-This foundation pass uses runtime-generated Godot primitive geometry and no imported production art or audio.
+This foundation uses runtime-generated Godot primitive geometry and one original generated placeholder audio file. No production art or copyrighted Voidcaller master is included.
+
+Current placeholder audio:
+
+- `assets/audio/placeholder/grotto_placeholder.wav` — original generated low ambient tone for development only; no external source or attribution required.
 
 Future workflow:
 

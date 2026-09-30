@@ -1,6 +1,6 @@
 # The Grotto
 
-A Godot 4.7.2 technical foundation for a dark, atmospheric third-person exploration/action game shaped by music.
+A Godot 4.7.2 first playable prototype for a dark, atmospheric third-person exploration/action game shaped by music.
 
 ## Run
 
@@ -10,7 +10,7 @@ A Godot 4.7.2 technical foundation for a dark, atmospheric third-person explorat
 
 ## Current playable path
 
-Main menu → Grotto hub → descent → placeholder enemy → manually triggered music event → Echo collectible → return gate → hub. All geometry and audio are placeholders.
+Main menu → Grotto hub → descent exploration → Hollow Echo encounter → manually triggered music event → interactable Echo chamber → Resonant Warden climax → return gate → hub. All geometry and audio are placeholders.
 
 ## Controls
 
@@ -19,5 +19,7 @@ Main menu → Grotto hub → descent → placeholder enemy → manually triggere
 - **C / Shift:** dodge
 - **E:** interact
 - **Escape:** pause toggle
+
+The Echo is collected with **E** when the prompt appears. The return gate opens only after the climax enemy is defeated.
 
 See [docs/DESIGN.md](docs/DESIGN.md), [docs/TECHNICAL.md](docs/TECHNICAL.md), and [docs/ROADMAP.md](docs/ROADMAP.md).

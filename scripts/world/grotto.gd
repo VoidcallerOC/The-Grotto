@@ -6,8 +6,14 @@ var prompt: Label
 var status: Label
 var gate_position := Vector3(0, 0, -8)
 var archive_position := Vector3(6, 0, 2)
+var gate_logged := false
+var movement_logged := false
+var debug_elapsed := 0.0
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	print("PLAYTEST SCENE_GROTTO")
+	print("PLAYTEST ECHO_PERSISTED ", SaveSystem.has_echo("first_echo"))
 	SaveSystem.set_location("grotto")
 	_build_environment()
 	player = PLAYER_SCENE.instantiate()
@@ -19,10 +25,18 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if not is_instance_valid(player):
 		return
+	debug_elapsed += _delta
+	if not movement_logged and debug_elapsed > 3.0:
+		movement_logged = true
+		print("PLAYTEST HUB_PLAYER_POSITION player=", player.global_position)
 	var distance := player.global_position.distance_to(gate_position)
+	if not gate_logged and distance < 5.0:
+		gate_logged = true
+		print("PLAYTEST HUB_NEAR_GATE player=", player.global_position, " gate=", gate_position, " distance=", distance)
 	if distance < 3.0:
 		prompt.text = "E  Enter the descent"
 		if Input.is_action_just_pressed("interact"):
+			print("PLAYTEST ENTER_DESCENT")
 			get_tree().change_scene_to_file("res://scenes/descent/descent.tscn")
 	else:
 		prompt.text = "Explore the Grotto. The descent waits in the dark."
@@ -47,7 +61,7 @@ func _build_environment() -> void:
 	light.omni_range = 18.0
 	add_child(light)
 	_add_box("Floor", Vector3(0, -0.35, 0), Vector3(18, 0.5, 18), Color("#1b2530"))
-	_add_box("FocalStone", Vector3(0, 1.2, 0), Vector3(2.4, 2.4, 2.4), Color("#36515a"))
+	_add_box("FocalStone", Vector3(3.2, 1.2, 0), Vector3(2.4, 2.4, 2.4), Color("#36515a"))
 	_add_box("DescentFrame", gate_position + Vector3(0, 2, 0), Vector3(4, 4, 0.8), Color("#512f4c"))
 	_add_box("Archive", archive_position + Vector3(0, 1, 0), Vector3(2, 2, 2), Color("#9b7b45"))
 
